@@ -3,132 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abyss Rift - Status</title>
+    <title>Abyss Rift - Control</title>
     <style>
         body {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+            background-color: #0d1117; color: #c9d1d9;
+            font-family: 'Segoe UI', monospace;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; text-align: center;
+        }
+        h1 { margin-bottom: 5px; color: #58a6ff; letter-spacing: 2px; }
+        
+        .card {
+            background: #161b22; border: 1px solid #30363d;
+            border-radius: 16px; padding: 30px; width: 90%; max-width: 420px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
         }
 
-        h1 { margin-bottom: 10px; color: #58a6ff; letter-spacing: 2px; text-transform: uppercase;}
+        /* ESTADOS */
+        .status-box { padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid transparent; transition: 0.3s;}
         
-        .container {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 15px;
-            padding: 40px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
+        .st-off-service { background: #222; border-color: #444; color: #777; }
+        .st-offline { background: #3d1c1c; border-color: #da3633; color: #ffadad; }
+        .st-online { background: #132e1d; border-color: #2ea043; color: #aff5b4; }
+        .st-loading { background: #3d3408; border-color: #d29922; color: #f5e0b6; }
 
-        /* INDICADOR DE ESTADO */
-        .status-box { margin: 20px 0; padding: 20px; border-radius: 10px; background: #0d1117; border: 2px solid #30363d; }
-        .status-indicator { height: 20px; width: 20px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 10px; }
-        
-        .online { background-color: #2ea043; box-shadow: 0 0 15px #2ea043; border: 2px solid #2ea043;}
-        .offline { background-color: #da3633; border: 2px solid #da3633; opacity: 0.5; }
-
-        .status-text { font-size: 24px; font-weight: bold; vertical-align: middle; }
+        .big-text { font-size: 28px; font-weight: 900; display: block; }
+        .sub-text { font-size: 14px; opacity: 0.8; }
 
         /* DATOS */
-        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #21262d; font-size: 18px;}
-        .val { font-weight: bold; color: #fff; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat { background: #21262d; padding: 10px; border-radius: 6px; font-size: 14px; }
+        .stat b { display: block; color: #fff; font-size: 18px; margin-top: 5px; }
 
-        /* COMANDO DE ENCENDIDO */
-        .cmd-area { margin-top: 30px; background: #000; padding: 15px; border-radius: 8px; text-align: left; position: relative; border: 1px solid #30363d;}
-        .cmd-title { font-size: 12px; color: #8b949e; margin-bottom: 5px; text-transform: uppercase; font-weight: bold;}
-        code { font-family: monospace; color: #a5d6ff; word-break: break-all; font-size: 13px; display: block;}
+        /* COMANDO */
+        .cmd-box { background: #000; padding: 15px; border-radius: 8px; text-align: left; border: 1px solid #30363d; }
+        code { color: #a5d6ff; word-break: break-all; font-size: 13px; display: block; margin-bottom: 10px; }
         
-        .copy-btn {
-            background: #238636; color: white; border: none; padding: 8px 15px;
-            border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
-            transition: 0.2s;
+        button {
+            width: 100%; padding: 10px; border: none; border-radius: 5px;
+            background: #238636; color: white; font-weight: bold; cursor: pointer;
         }
-        .copy-btn:hover { background: #2ea043; }
-        .copy-btn:active { transform: scale(0.98); }
+        button:hover { background: #2ea043; }
+        button:disabled { background: #444; cursor: not-allowed; }
 
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="card">
         <h1>ABYSS RIFT</h1>
-        <p style="color:#8b949e; margin-top:0;">Server Dashboard</p>
+        <p style="font-size:12px; color:#8b949e; margin-bottom:20px;">IP: 201.188.96.213:25565</p>
 
-        <div class="status-box">
-            <span id="dot" class="status-indicator offline"></span>
-            <span id="txt" class="status-text">OFFLINE</span>
-        </div>
-
-        <div class="info-row">
-            <span>Jugadores:</span>
-            <span id="players" class="val">-</span>
-        </div>
-        <div class="info-row" style="border:none;">
-            <span>IP:</span>
-            <span class="val" style="color:#a5d6ff">201.188.96.213:25565</span>
+        <div id="box" class="status-box st-off-service">
+            <span id="status-txt" class="big-text">OFF SERVICE</span>
+            <span id="desc-txt" class="sub-text">Sin conexión con el PC</span>
         </div>
 
-        <div class="cmd-area">
-            <div class="cmd-title">⚡ Para encender (PowerShell):</div>
-            <code id="cmdText">Invoke-RestMethod -Uri "http://201.188.96.213:5000/start"</code>
-            <button class="copy-btn" onclick="copiarComando()">COPIAR COMANDO</button>
+        <div class="grid">
+            <div class="stat">Temp CPU <b id="temp">-</b></div>
+            <div class="stat">Batería <b id="bat">-</b></div>
+            <div class="stat">Jugadores <b id="jug">-</b></div>
+            <div class="stat">Ping <b id="ping">Directo</b></div>
         </div>
+
+        <div class="cmd-box">
+            <div style="font-size:11px; color:#8b949e; margin-bottom:5px; font-weight:bold;">⚡ COMANDO DE ENCENDIDO:</div>
+            <code id="cmdCode">Invoke-RestMethod -Uri "http://201.188.96.213:5000/start"</code>
+            <button onclick="copiar()" id="btn-copy">COPIAR AL PORTAPAPELES</button>
+        </div>
+        
+        <p style="font-size: 10px; color: #555; margin-top: 15px;">
+            *Si no actualiza, revisa el candado del navegador (Permitir contenido no seguro).
+        </p>
     </div>
 
     <script>
-        // API PÚBLICA DE MINECRAFT (Funciona en GitHub HTTPS)
-        const SERVER_IP = "201.188.96.213";
-        const PORT = "25565";
-        const API_URL = `https://api.mcsrvstat.us/2/${SERVER_IP}:${PORT}`;
+        const API = "http://201.188.96.213:5000"; // Tu IP Directa
 
-        const dot = document.getElementById('dot');
-        const txt = document.getElementById('txt');
-        const players = document.getElementById('players');
+        const ui = {
+            box: document.getElementById('box'),
+            txt: document.getElementById('status-txt'),
+            desc: document.getElementById('desc-txt'),
+            temp: document.getElementById('temp'),
+            bat: document.getElementById('bat'),
+            jug: document.getElementById('jug')
+        };
 
-        async function updateStatus() {
+        async function update() {
             try {
-                // Consultamos a mcsrvstat.us
-                const response = await fetch(API_URL);
-                const data = await response.json();
+                // Timeout de 2 segundos. Si no responde en 2s, asumimos OFF SERVICE
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), 2000);
+                
+                const res = await fetch(API + "/status", { signal: controller.signal });
+                const data = await res.json();
+                clearTimeout(id);
 
-                if (data.online) {
-                    dot.className = "status-indicator online";
-                    txt.innerText = "ONLINE";
-                    txt.style.color = "#2ea043";
-                    players.innerText = `${data.players.online} / ${data.players.max}`;
+                // SI LLEGAMOS AQUÍ, EL AGENTE.PY ESTÁ CORRIENDO
+                ui.temp.innerText = data.temp;
+                ui.bat.innerText = data.bateria;
+                ui.jug.innerText = data.jugadores;
+
+                if (data.estado === "encendido") {
+                    setVisual("st-online", "ONLINE", "Servidor Operativo");
+                } else if (data.estado === "cargando") {
+                    setVisual("st-loading", "INICIANDO", "Cargando mundo...");
                 } else {
-                    dot.className = "status-indicator offline";
-                    txt.innerText = "OFFLINE";
-                    txt.style.color = "#da3633";
-                    players.innerText = "-";
+                    setVisual("st-offline", "OFFLINE", "PC Listo. Usa el comando.");
                 }
-            } catch (error) {
-                console.error("Error consultando estado", error);
+
+            } catch (e) {
+                // SI FALLA EL FETCH, ES OFF SERVICE
+                setVisual("st-off-service", "OFF SERVICE", "Agente desconectado");
+                ui.temp.innerText = "-";
+                ui.bat.innerText = "-";
+                ui.jug.innerText = "-";
             }
         }
 
-        function copiarComando() {
-            const cmd = document.getElementById('cmdText').innerText;
-            navigator.clipboard.writeText(cmd).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                btn.innerText = "¡COPIADO!";
-                setTimeout(() => btn.innerText = "COPIAR COMANDO", 2000);
-            });
+        function setVisual(cls, title, desc) {
+            ui.box.className = "status-box " + cls;
+            ui.txt.innerText = title;
+            ui.desc.innerText = desc;
         }
 
-        // Actualizar cada 10 segundos (Las APIs públicas tienen caché, no sirve hacerlo cada 1s)
-        setInterval(updateStatus, 10000);
-        updateStatus();
+        function copiar() {
+            const txt = document.getElementById('cmdCode').innerText;
+            navigator.clipboard.writeText(txt);
+            document.getElementById('btn-copy').innerText = "¡COPIADO!";
+            setTimeout(() => document.getElementById('btn-copy').innerText = "COPIAR AL PORTAPAPELES", 2000);
+        }
+
+        // Actualizar cada 3 segundos (RÁPIDO)
+        setInterval(update, 3000);
+        update();
     </script>
 </body>
 </html>
