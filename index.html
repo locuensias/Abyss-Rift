@@ -3,77 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado Server Minecraft</title>
+    <title>Abyss Rift - Status</title>
     <style>
-        body { font-family: sans-serif; background: #111; color: white; text-align: center; padding-top: 50px; }
-        .box { border: 2px solid #333; display: inline-block; padding: 40px; border-radius: 20px; background: #222; }
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 { margin-bottom: 10px; color: #58a6ff; letter-spacing: 2px; text-transform: uppercase;}
         
-        /* Círculos de estado */
-        .dot { height: 25px; width: 25px; background: #555; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 10px;}
-        .on { background: #0f0; box-shadow: 0 0 20px #0f0; }
-        .boot { background: #ff0; animation: latido 1s infinite; }
-        .off { background: #f00; }
+        .container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 15px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        /* INDICADOR DE ESTADO */
+        .status-box { margin: 20px 0; padding: 20px; border-radius: 10px; background: #0d1117; border: 2px solid #30363d; }
+        .status-indicator { height: 20px; width: 20px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 10px; }
         
-        @keyframes latido { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .online { background-color: #2ea043; box-shadow: 0 0 15px #2ea043; border: 2px solid #2ea043;}
+        .offline { background-color: #da3633; border: 2px solid #da3633; opacity: 0.5; }
+
+        .status-text { font-size: 24px; font-weight: bold; vertical-align: middle; }
+
+        /* DATOS */
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #21262d; font-size: 18px;}
+        .val { font-weight: bold; color: #fff; }
+
+        /* COMANDO DE ENCENDIDO */
+        .cmd-area { margin-top: 30px; background: #000; padding: 15px; border-radius: 8px; text-align: left; position: relative; border: 1px solid #30363d;}
+        .cmd-title { font-size: 12px; color: #8b949e; margin-bottom: 5px; text-transform: uppercase; font-weight: bold;}
+        code { font-family: monospace; color: #a5d6ff; word-break: break-all; font-size: 13px; display: block;}
         
-        h1 { margin: 0 0 20px 0; font-size: 24px; color: #ddd; }
-        .data { font-size: 18px; margin: 10px 0; border-bottom: 1px solid #444; padding-bottom: 5px; }
-        .ip { margin-top: 30px; font-family: monospace; background: #000; padding: 10px; border-radius: 5px; color: #0ff; font-size: 16px; }
+        .copy-btn {
+            background: #238636; color: white; border: none; padding: 8px 15px;
+            border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
+            transition: 0.2s;
+        }
+        .copy-btn:hover { background: #2ea043; }
+        .copy-btn:active { transform: scale(0.98); }
+
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h1>ESTADO DEL SERVIDOR</h1>
-        
-        <div style="font-size: 30px; margin-bottom: 30px;">
-            <span id="dot" class="dot off"></span>
-            <span id="txt">DESCONECTADO</span>
+    <div class="container">
+        <h1>ABYSS RIFT</h1>
+        <p style="color:#8b949e; margin-top:0;">Server Dashboard</p>
+
+        <div class="status-box">
+            <span id="dot" class="status-indicator offline"></span>
+            <span id="txt" class="status-text">OFFLINE</span>
         </div>
 
-        <div class="data">Jugadores: <b id="jug">-</b></div>
-        <div class="data">Batería Host: <b id="bat">-</b></div>
+        <div class="info-row">
+            <span>Jugadores:</span>
+            <span id="players" class="val">-</span>
+        </div>
+        <div class="info-row" style="border:none;">
+            <span>IP:</span>
+            <span class="val" style="color:#a5d6ff">201.188.96.213:25565</span>
+        </div>
 
-        <div class="ip">IP: 201.188.96.213:25565</div>
-        <p style="font-size: 12px; color: #666; margin-top: 20px;">
-            Si está en ROJO, usa el comando de PowerShell para encenderlo.
-        </p>
+        <div class="cmd-area">
+            <div class="cmd-title">⚡ Para encender (PowerShell):</div>
+            <code id="cmdText">Invoke-RestMethod -Uri "http://201.188.96.213:5000/start"</code>
+            <button class="copy-btn" onclick="copiarComando()">COPIAR COMANDO</button>
+        </div>
     </div>
 
     <script>
-        // CONEXIÓN DIRECTA (Sin túneles, sin serveo, pura fibra)
-        const API = "http://201.188.96.213:5000";
+        // API PÚBLICA DE MINECRAFT (Funciona en GitHub HTTPS)
+        const SERVER_IP = "201.188.96.213";
+        const PORT = "25565";
+        const API_URL = `https://api.mcsrvstat.us/2/${SERVER_IP}:${PORT}`;
 
-        async function check() {
-            const dot = document.getElementById('dot');
-            const txt = document.getElementById('txt');
-            
+        const dot = document.getElementById('dot');
+        const txt = document.getElementById('txt');
+        const players = document.getElementById('players');
+
+        async function updateStatus() {
             try {
-                // Intentamos conectar directo a tu casa
-                const res = await fetch(API + "/status");
-                const data = await res.json();
+                // Consultamos a mcsrvstat.us
+                const response = await fetch(API_URL);
+                const data = await response.json();
 
-                document.getElementById('jug').innerText = data.jugadores;
-                document.getElementById('bat').innerText = data.bateria;
-
-                if (data.estado === "encendido") {
-                    dot.className = "dot on"; txt.innerText = "ONLINE";
-                } else if (data.estado === "encendiendo") {
-                    dot.className = "dot boot"; txt.innerText = "INICIANDO...";
+                if (data.online) {
+                    dot.className = "status-indicator online";
+                    txt.innerText = "ONLINE";
+                    txt.style.color = "#2ea043";
+                    players.innerText = `${data.players.online} / ${data.players.max}`;
                 } else {
-                    dot.className = "dot off"; txt.innerText = "APAGADO (OFF)";
+                    dot.className = "status-indicator offline";
+                    txt.innerText = "OFFLINE";
+                    txt.style.color = "#da3633";
+                    players.innerText = "-";
                 }
-            } catch (e) {
-                // Si falla es porque tu PC está apagado o el script de python cerrado
-                dot.className = "dot off"; 
-                txt.innerText = "OFFLINE";
-                document.getElementById('jug').innerText = "-";
-                document.getElementById('bat').innerText = "-";
+            } catch (error) {
+                console.error("Error consultando estado", error);
             }
         }
 
-        setInterval(check, 3000); // Revisa cada 3 segundos
-        check();
+        function copiarComando() {
+            const cmd = document.getElementById('cmdText').innerText;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = "¡COPIADO!";
+                setTimeout(() => btn.innerText = "COPIAR COMANDO", 2000);
+            });
+        }
+
+        // Actualizar cada 10 segundos (Las APIs públicas tienen caché, no sirve hacerlo cada 1s)
+        setInterval(updateStatus, 10000);
+        updateStatus();
     </script>
 </body>
 </html>
