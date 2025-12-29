@@ -3,57 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado del Server</title>
+    <title>Estado Server Minecraft</title>
     <style>
-        body {
-            background-color: #0d1117; color: #c9d1d9;
-            font-family: monospace;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; margin: 0;
-        }
-        .card {
-            background: #161b22; border: 1px solid #30363d;
-            border-radius: 10px; padding: 30px; width: 300px; text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        h2 { color: #58a6ff; margin-bottom: 20px; }
+        body { font-family: sans-serif; background: #111; color: white; text-align: center; padding-top: 50px; }
+        .box { border: 2px solid #333; display: inline-block; padding: 40px; border-radius: 20px; background: #222; }
         
-        .status-dot {
-            height: 15px; width: 15px; background-color: #bbb;
-            border-radius: 50%; display: inline-block; margin-right: 8px;
-        }
-        .on { background-color: #2ea043; box-shadow: 0 0 10px #2ea043; } /* Verde */
-        .boot { background-color: #dbab09; animation: parpadeo 1s infinite; } /* Amarillo */
-        .off { background-color: #da3633; } /* Rojo */
-
-        .info { display: flex; justify-content: space-between; margin: 10px 0; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        /* Círculos de estado */
+        .dot { height: 25px; width: 25px; background: #555; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 10px;}
+        .on { background: #0f0; box-shadow: 0 0 20px #0f0; }
+        .boot { background: #ff0; animation: latido 1s infinite; }
+        .off { background: #f00; }
         
-        @keyframes parpadeo { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes latido { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        h1 { margin: 0 0 20px 0; font-size: 24px; color: #ddd; }
+        .data { font-size: 18px; margin: 10px 0; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .ip { margin-top: 30px; font-family: monospace; background: #000; padding: 10px; border-radius: 5px; color: #0ff; font-size: 16px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>MINECRAFT STATUS</h2>
+
+    <div class="box">
+        <h1>ESTADO DEL SERVIDOR</h1>
         
-        <div style="font-size: 20px; margin-bottom: 20px;">
-            <span id="dot" class="status-dot off"></span>
-            <span id="txt">OFFLINE</span>
+        <div style="font-size: 30px; margin-bottom: 30px;">
+            <span id="dot" class="dot off"></span>
+            <span id="txt">DESCONECTADO</span>
         </div>
 
-        <div class="info"><span>Jugadores:</span> <b id="jug">-</b></div>
-        <div class="info"><span>Batería PC:</span> <b id="bat">-</b></div>
-        <br>
-        <small style="color: #666">IP PARA JUGAR: <b>201.188.96.213:25565</b></small>
+        <div class="data">Jugadores: <b id="jug">-</b></div>
+        <div class="data">Batería Host: <b id="bat">-</b></div>
+
+        <div class="ip">IP: 201.188.96.213:25565</div>
+        <p style="font-size: 12px; color: #666; margin-top: 20px;">
+            Si está en ROJO, usa el comando de PowerShell para encenderlo.
+        </p>
     </div>
 
     <script>
-        // TU ENLACE SEGURO DE SERVEO
-        const API = "https://d7229e01a6fccb92-201-188-96-213.serveousercontent.com";
+        // CONEXIÓN DIRECTA (Sin túneles, sin serveo, pura fibra)
+        const API = "http://201.188.96.213:5000";
 
-        async function loop() {
+        async function check() {
             const dot = document.getElementById('dot');
             const txt = document.getElementById('txt');
+            
             try {
+                // Intentamos conectar directo a tu casa
                 const res = await fetch(API + "/status");
                 const data = await res.json();
 
@@ -61,18 +57,23 @@
                 document.getElementById('bat').innerText = data.bateria;
 
                 if (data.estado === "encendido") {
-                    dot.className = "status-dot on"; txt.innerText = "ONLINE";
+                    dot.className = "dot on"; txt.innerText = "ONLINE";
                 } else if (data.estado === "encendiendo") {
-                    dot.className = "status-dot boot"; txt.innerText = "INICIANDO...";
+                    dot.className = "dot boot"; txt.innerText = "INICIANDO...";
                 } else {
-                    dot.className = "status-dot off"; txt.innerText = "APAGADO";
+                    dot.className = "dot off"; txt.innerText = "APAGADO (OFF)";
                 }
             } catch (e) {
-                dot.className = "status-dot off"; txt.innerText = "DESCONECTADO";
+                // Si falla es porque tu PC está apagado o el script de python cerrado
+                dot.className = "dot off"; 
+                txt.innerText = "OFFLINE";
+                document.getElementById('jug').innerText = "-";
+                document.getElementById('bat').innerText = "-";
             }
         }
-        setInterval(loop, 3000); // Revisa cada 3 seg
-        loop();
+
+        setInterval(check, 3000); // Revisa cada 3 segundos
+        check();
     </script>
 </body>
 </html>
