@@ -19,7 +19,6 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
         }
 
-        /* ESTADOS */
         .status-box { padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid transparent; transition: 0.3s;}
         
         .st-off-service { background: #222; border-color: #444; color: #777; }
@@ -30,12 +29,13 @@
         .big-text { font-size: 28px; font-weight: 900; display: block; }
         .sub-text { font-size: 14px; opacity: 0.8; }
 
-        /* DATOS */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: #21262d; padding: 10px; border-radius: 6px; font-size: 14px; }
         .stat b { display: block; color: #fff; font-size: 18px; margin-top: 5px; }
+        
+        /* Estilo especial para la lista de jugadores por si es larga */
+        #jug { word-wrap: break-word; font-size: 14px; line-height: 1.2; }
 
-        /* COMANDO */
         .cmd-box { background: #000; padding: 15px; border-radius: 8px; text-align: left; border: 1px solid #30363d; }
         code { color: #a5d6ff; word-break: break-all; font-size: 13px; display: block; margin-bottom: 10px; }
         
@@ -44,7 +44,6 @@
             background: #238636; color: white; font-weight: bold; cursor: pointer;
         }
         button:hover { background: #2ea043; }
-        button:disabled { background: #444; cursor: not-allowed; }
 
     </style>
 </head>
@@ -62,8 +61,9 @@
         <div class="grid">
             <div class="stat">Temp CPU <b id="temp">-</b></div>
             <div class="stat">Batería <b id="bat">-</b></div>
-            <div class="stat">Jugadores <b id="jug">-</b></div>
-            <div class="stat">Ping <b id="ping">Directo</b></div>
+            <div class="stat" style="grid-column: span 2;">
+                En Línea: <b id="jug">-</b>
+            </div>
         </div>
 
         <div class="cmd-box">
@@ -78,7 +78,7 @@
     </div>
 
     <script>
-        const API = "http://201.188.96.213:5000"; // Tu IP Directa
+        const API = "http://201.188.96.213:5000";
 
         const ui = {
             box: document.getElementById('box'),
@@ -91,7 +91,6 @@
 
         async function update() {
             try {
-                // Timeout de 2 segundos. Si no responde en 2s, asumimos OFF SERVICE
                 const controller = new AbortController();
                 const id = setTimeout(() => controller.abort(), 2000);
                 
@@ -99,10 +98,16 @@
                 const data = await res.json();
                 clearTimeout(id);
 
-                // SI LLEGAMOS AQUÍ, EL AGENTE.PY ESTÁ CORRIENDO
                 ui.temp.innerText = data.temp;
                 ui.bat.innerText = data.bateria;
-                ui.jug.innerText = data.jugadores;
+                
+                // Muestra los nombres o "Vacio"
+                ui.jug.innerText = data.jugadores; 
+                if(data.jugadores !== "Vacio" && data.jugadores !== "Nadie") {
+                    ui.jug.style.color = "#a5d6ff"; // Color azulito si hay nombres
+                } else {
+                    ui.jug.style.color = "#fff";
+                }
 
                 if (data.estado === "encendido") {
                     setVisual("st-online", "ONLINE", "Servidor Operativo");
@@ -113,7 +118,6 @@
                 }
 
             } catch (e) {
-                // SI FALLA EL FETCH, ES OFF SERVICE
                 setVisual("st-off-service", "OFF SERVICE", "Agente desconectado");
                 ui.temp.innerText = "-";
                 ui.bat.innerText = "-";
@@ -134,7 +138,6 @@
             setTimeout(() => document.getElementById('btn-copy').innerText = "COPIAR AL PORTAPAPELES", 2000);
         }
 
-        // Actualizar cada 3 segundos (RÁPIDO)
         setInterval(update, 3000);
         update();
     </script>
