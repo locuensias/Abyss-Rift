@@ -33,7 +33,6 @@
         .stat { background: #21262d; padding: 10px; border-radius: 6px; font-size: 14px; }
         .stat b { display: block; color: #fff; font-size: 18px; margin-top: 5px; }
         
-        /* Estilo especial para la lista de jugadores por si es larga */
         #jug { word-wrap: break-word; font-size: 14px; line-height: 1.2; }
 
         .cmd-box { background: #000; padding: 15px; border-radius: 8px; text-align: left; border: 1px solid #30363d; }
@@ -78,6 +77,7 @@
     </div>
 
     <script>
+        // CAMBIO 3: CONEXIÓN JAVASCRIPT (Vital para ver el estado)
         const API = "http://201.188.96.213:5000";
 
         const ui = {
@@ -101,10 +101,9 @@
                 ui.temp.innerText = data.temp;
                 ui.bat.innerText = data.bateria;
                 
-                // Muestra los nombres o "Vacio"
                 ui.jug.innerText = data.jugadores; 
                 if(data.jugadores !== "Vacio" && data.jugadores !== "Nadie") {
-                    ui.jug.style.color = "#a5d6ff"; // Color azulito si hay nombres
+                    ui.jug.style.color = "#a5d6ff";
                 } else {
                     ui.jug.style.color = "#fff";
                 }
