@@ -3,92 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abyss Rift - Estado del Reino</title>
-    <!-- Fuentes inmersivas -->
+    <title>Abyss Rift - Portal del Reino</title>
+    
+    <!-- FUENTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=MedievalSharp&family=Minecraft+Five&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=MedievalSharp&family=Minecraft+Five&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
     <style>
+        /* --- VARIABLES UNIFICADAS --- */
         :root {
-            /* Paleta Minecraft Dark Fantasy */
+            /* Variables de Pag 1 (Estado) */
             --bg-overlay: rgba(20, 10, 5, 0.75);
             --board-bg: rgba(30, 20, 15, 0.85);
             --border-wood: #5D4037;
             --border-gold: #FFD700;
             --text-main: #E0E0E0;
             --text-gold: #FFECB3;
-            
-            /* Colores de Estado */
-            --gem-online: #55FF55; /* Minecraft Lime */
-            --gem-offline: #FF5555; /* Minecraft Red */
-            --gem-loading: #FFAA00; /* Minecraft Gold */
+            --gem-online: #55FF55;
+            --gem-offline: #FF5555;
+            --gem-loading: #FFAA00;
             --gem-neutral: #AAAAAA;
+
+            /* Variables del Texto (Misiones) */
+            --wood-dark: #2a1d15;
+            --wood-light: #3e2b20;
+            --parchment-bg: #dcd0b3;
+            --parchment-dark: #c5b89c;
+            --ink-color: #2b1d16;
+            --blood-red: #7a1515;
+            --gold-accent: #cfaa56;
+            --iron-gray: #4a4e52;
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+            /* Permitir scroll vertical, ocultar horizontal */
+            overflow-x: hidden; 
+            font-family: 'MedievalSharp', cursive;
+            background-color: #050505;
+            color: var(--text-main);
+        }
+
+        /* =========================================
+           SECCIÓN 1: ESTADO DEL REINO (FIJA)
+           ========================================= */
+        #section-status {
+            position: fixed; /* CLAVE: Se queda fija */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1; /* Nivel bajo */
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Para que las luciérnagas no creen scroll */
-            font-family: 'MedievalSharp', cursive;
-            color: var(--text-main);
-            background-color: #050505;
+            background: #0a0502;
         }
 
-        /* --- FONDO Y AMBIENTACIÓN --- */
-
-        /* 1. Imagen de Fondo (Tu imagen personalizada) */
+        /* ELEMENTOS DE AMBIENTACIÓN (PAG 1) */
         .bg-layer {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* AQUÍ ESTÁ TU IMAGEN: Asegúrate que el archivo jpg esté junto al html */
+            /* IMAGEN RESTAURADA (JPG ORIGINAL) */
             background: url('Gemini_Generated_Image_r1emhr1emhr1emhr.jpg') no-repeat center center;
             background-size: cover;
-            /* Efecto borroso solicitado */
-            filter: blur(8px) brightness(0.6); 
+            filter: blur(4px) brightness(0.6); 
             z-index: -3;
-            transform: scale(1.1); /* Escala un poco para evitar bordes blancos por el blur */
         }
 
-        /* 2. Vignette suave para oscurecer esquinas */
         .vignette {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.9) 100%);
             z-index: -2;
             pointer-events: none;
         }
 
-        /* 3. Contenedor de Luciérnagas */
         .fireflies-container {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
             pointer-events: none;
         }
 
-        /* Luciérnaga base */
         .firefly {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background-color: #ccff66; /* Color amarillo-verdoso realista */
+            background-color: #ccff66;
             border-radius: 50%;
-            box-shadow: 0 0 10px 2px rgba(204, 255, 102, 0.6); /* Resplandor suave */
-            opacity: 0; /* Empiezan invisibles */
-            /* Animación combinada: Movimiento y Parpadeo */
+            box-shadow: 0 0 10px 2px rgba(204, 255, 102, 0.6);
+            opacity: 0;
             animation: drift ease-in-out infinite, flash ease-in-out infinite;
         }
 
-        /* Movimiento suave y errático */
         @keyframes drift {
             0% { transform: translate(0, 0); }
             25% { transform: translate(var(--moveX1), var(--moveY1)); }
@@ -97,16 +109,13 @@
             100% { transform: translate(0, 0); }
         }
 
-        /* Parpadeo realista (fade in/out) */
         @keyframes flash {
             0%, 100% { opacity: 0; }
-            10%, 90% { opacity: 0; } /* Se mantienen apagadas un tiempo */
-            50% { opacity: 1; box-shadow: 0 0 15px 4px rgba(204, 255, 102, 0.8); } /* Brillo máximo */
+            50% { opacity: 1; box-shadow: 0 0 15px 4px rgba(204, 255, 102, 0.8); }
         }
 
-        /* --- UI DEL TABLERO (INTACTA) --- */
-
-        .quest-board {
+        /* ESTILOS DE LA TARJETA DE ESTADO */
+        .status-card {
             position: relative;
             width: 90%;
             max-width: 480px;
@@ -116,12 +125,12 @@
             padding: 2rem;
             text-align: center;
             box-shadow: 
-                0 0 0 4px #2b1b11, /* Borde doble */
-                0 20px 60px rgba(0,0,0,0.8), /* Sombra profunda */
-                inset 0 0 50px rgba(0,0,0,0.8); /* Vignette interna */
+                0 0 0 4px #2b1b11, 
+                0 20px 60px rgba(0,0,0,0.8), 
+                inset 0 0 50px rgba(0,0,0,0.8);
             backdrop-filter: blur(5px);
-            /* Animación de entrada suave */
             animation: float-in 1s ease-out;
+            z-index: 5; /* Aseguramos que esté sobre el fondo */
         }
 
         @keyframes float-in {
@@ -129,7 +138,6 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Decoración de esquinas (estilo clavo/hierro) */
         .corner {
             position: absolute;
             width: 16px; height: 16px;
@@ -143,7 +151,7 @@
         .bl { bottom: 10px; left: 10px; }
         .br { bottom: 10px; right: 10px; }
 
-        h1 {
+        h1.status-title {
             font-family: 'Cinzel', serif;
             font-size: 2.5rem;
             margin: 0;
@@ -165,7 +173,6 @@
             display: inline-block;
         }
 
-        /* GEMA DE ESTADO */
         .status-gem-container {
             margin: 20px 0;
             display: flex;
@@ -178,14 +185,13 @@
             height: 70px;
             background: #333;
             border: 2px solid rgba(255,255,255,0.2);
-            transform: rotate(45deg); /* Rombo estilo RPG */
+            transform: rotate(45deg);
             margin: 15px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s;
             position: relative;
         }
 
-        /* Brillo interno gema */
         .gem::after {
             content: '';
             position: absolute;
@@ -202,54 +208,23 @@
             margin-top: 10px;
         }
 
-        .status-desc {
-            font-size: 0.9rem;
-            font-style: italic;
-            color: #ccc;
-            opacity: 0.8;
-        }
+        .status-desc { font-size: 0.9rem; font-style: italic; color: #ccc; opacity: 0.8; }
 
-        /* ESTADOS DE LA GEMA */
-        .st-online .gem {
-            background: var(--gem-online);
-            box-shadow: 0 0 30px var(--gem-online), inset 0 0 10px white;
-            border-color: #fff;
-        }
+        /* Estados Gema */
+        .st-online .gem { background: var(--gem-online); box-shadow: 0 0 30px var(--gem-online), inset 0 0 10px white; border-color: #fff; }
         .st-online .status-text { color: var(--gem-online); }
-
-        .st-offline .gem {
-            background: var(--gem-offline);
-            box-shadow: 0 0 20px var(--gem-offline);
-            border-color: #500;
-        }
+        .st-offline .gem { background: var(--gem-offline); box-shadow: 0 0 20px var(--gem-offline); border-color: #500; }
         .st-offline .status-text { color: var(--gem-offline); }
-
-        .st-loading .gem {
-            background: var(--gem-loading);
-            box-shadow: 0 0 25px var(--gem-loading);
-            animation: pulse-loading 1s infinite alternate;
-        }
+        .st-loading .gem { background: var(--gem-loading); box-shadow: 0 0 25px var(--gem-loading); animation: pulse-loading 1s infinite alternate; }
         .st-loading .status-text { color: var(--gem-loading); }
-        
-        .st-off-service .gem {
-            background: #444;
-            box-shadow: none;
-        }
+        .st-off-service .gem { background: #444; }
 
         @keyframes pulse-loading {
             from { box-shadow: 0 0 15px var(--gem-loading); transform: rotate(45deg) scale(0.95); }
             to { box-shadow: 0 0 35px var(--gem-loading); transform: rotate(45deg) scale(1.05); }
         }
 
-        /* GRID DE ESTADÍSTICAS */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 25px;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin-bottom: 25px; }
         .stat-card {
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255,255,255,0.1);
@@ -258,31 +233,11 @@
             text-align: center;
             transition: transform 0.2s;
         }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,0.3);
-            background: rgba(255,255,255,0.05);
-        }
-
-        .stat-label {
-            display: block;
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 2px 2px #000;
-        }
-
+        .stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
+        .stat-label { display: block; font-size: 0.8rem; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-value { font-size: 1.2rem; font-weight: bold; color: #fff; text-shadow: 0 2px 2px #000; }
         .col-span-2 { grid-column: span 2; }
 
-        /* CAJA DE COMANDOS */
         .spell-scroll {
             background: #1a1a1a;
             border: 2px solid #333;
@@ -290,152 +245,351 @@
             padding: 15px;
             position: relative;
             overflow: hidden;
-        }
-
-        .spell-scroll::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--gem-loading); /* Acentuación naranja */
-        }
-
-        .spell-title {
-            font-size: 0.8rem;
-            color: var(--gem-loading);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
             text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
+        .spell-scroll::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gem-loading); }
+        .spell-title { font-size: 0.8rem; color: var(--gem-loading); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
-        code {
-            display: block;
-            background: #000;
-            color: #00ff00; /* Terminal clásico */
-            font-family: 'Consolas', monospace;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            margin-bottom: 12px;
-            word-break: break-all;
-            border: 1px solid #333;
-        }
+        code { display: block; background: #000; color: #00ff00; font-family: 'Consolas', monospace; padding: 10px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 12px; word-break: break-all; border: 1px solid #333; }
 
         button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(to bottom, #388E3C, #1B5E20); /* Verde Minecraft */
-            border: 2px solid #000;
-            color: white;
-            font-family: 'Minecraft Five', 'Cinzel', sans-serif; /* Fallback */
-            font-size: 1rem;
-            cursor: pointer;
-            text-shadow: 2px 2px 0 #000;
-            box-shadow: 0 4px 0 #0f3d0f; /* Efecto 3D botón */
-            position: relative;
+            width: 100%; padding: 14px;
+            background: linear-gradient(to bottom, #388E3C, #1B5E20);
+            border: 2px solid #000; color: white;
+            font-family: 'Minecraft Five', 'Cinzel', sans-serif;
+            font-size: 1rem; cursor: pointer;
+            text-shadow: 2px 2px 0 #000; box-shadow: 0 4px 0 #0f3d0f;
             transition: all 0.1s;
         }
+        button:hover { filter: brightness(1.1); }
+        button:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
+        .disclaimer { margin-top: 15px; font-size: 0.7rem; color: #777; }
+        .player-active { color: var(--gem-online) !important; text-shadow: 0 0 10px var(--gem-online); }
 
-        button:hover {
-            filter: brightness(1.1);
+
+        /* =========================================
+           SECCIÓN 2: TABLÓN DE MISIONES (SCROLL)
+           ========================================= */
+        #section-missions {
+            position: relative;
+            z-index: 10;
+            margin-top: 100vh;
+            
+            min-height: 100vh;
+            width: 100%;
+            background-color: #150f0a; 
+            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            
+            /* MEJORA VISUAL DE BORDE Y SOMBRA */
+            border-top: 8px solid #3e2b20; /* Borde madera */
+            box-shadow: 
+                0 -6px 0 var(--gold-accent), /* Línea dorada fina */
+                0 -50px 100px rgba(0,0,0,1); /* Sombra muy profunda para tapar */
         }
 
-        button:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #000;
+        /* Clase de animación para scroll */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .disclaimer {
-            margin-top: 15px;
-            font-size: 0.7rem;
-            color: #777;
+        /* El Tablón de Madera Principal */
+        .quest-board {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--wood-dark);
+            background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 40px),
+                              linear-gradient(0deg, rgba(0,0,0,0.4), transparent 20%, transparent 80%, rgba(0,0,0,0.4));
+            border: 12px solid #1a120d;
+            border-radius: 8px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5);
+            padding: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            font-family: 'Crimson Pro', serif;
+            color: var(--ink-color);
         }
 
-        /* Estilo para cuando hay jugadores */
-        .player-active {
-            color: var(--gem-online) !important;
-            text-shadow: 0 0 10px var(--gem-online);
+        /* Clavos */
+        .quest-board::before, .quest-board::after {
+            content: ''; position: absolute; width: 15px; height: 15px;
+            background: radial-gradient(circle at 30% 30%, #6e747a, #2c3033);
+            border-radius: 50%; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); top: 15px;
+        }
+        .quest-board::before { left: 15px; }
+        .quest-board::after { right: 15px; }
+
+        /* HEADER */
+        .hardware-plate {
+            background: linear-gradient(180deg, #3d4144 0%, #2b2e31 100%);
+            border: 2px solid #5e6469; border-radius: 4px; padding: 20px;
+            color: #d0d0d0; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6); margin-bottom: 10px;
+        }
+        .hardware-plate h2 {
+            font-family: 'Cinzel', serif; color: var(--gold-accent); text-transform: uppercase;
+            font-size: 1.5rem; margin-bottom: 15px; letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+        }
+        .specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 0.95rem; }
+        .spec-item strong { display: block; color: var(--gold-accent); font-size: 0.8rem; text-transform: uppercase; }
+
+        /* LAYOUT */
+        .notices-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; align-items: start; }
+
+        /* PERGAMINOS */
+        .parchment {
+            background-color: var(--parchment-bg);
+            padding: 25px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            position: relative; transition: transform 0.3s ease; color: var(--ink-color);
+        }
+        .parchment:hover { transform: scale(1.02) !important; z-index: 20; }
+        .pin {
+            width: 12px; height: 12px; background: radial-gradient(circle at 30% 30%, #8a2be2, #2c0e4a);
+            border-radius: 50%; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            box-shadow: 1px 2px 4px rgba(0,0,0,0.4);
+        }
+        .parchment h3 {
+            font-family: 'IM+Fell+English+SC', serif; font-size: 1.6rem; text-align: center;
+            border-bottom: 2px solid var(--ink-color); margin-bottom: 15px; padding-bottom: 5px; margin-top: 10px;
+        }
+        .mod-list { list-style: none; font-size: 0.9rem; }
+        .mod-list li {
+            margin-bottom: 4px; line-height: 1.3; border-bottom: 1px dashed rgba(43, 29, 22, 0.2);
+            padding-bottom: 2px; display: flex; justify-content: space-between;
+        }
+        .mod-name { font-weight: bold; }
+        .mod-desc { font-style: italic; font-size: 0.85rem; color: #5c4033; text-align: right; margin-left: 5px;}
+
+        /* VARIACIONES */
+        .combat-paper {
+            background-image: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+            transform: rotate(-2deg);
+        }
+        .combat-paper h3 { color: var(--blood-red); border-color: var(--blood-red); }
+        .world-paper { background-color: #e8dfc8; transform: rotate(1.5deg); }
+        .utility-paper { background-color: #f0ebe0; transform: rotate(-1deg); }
+
+        .tech-paper {
+            background-color: #d6d6d6; transform: rotate(1deg); font-size: 0.8rem;
+            grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; border: 1px solid #999;
+        }
+        .tech-paper h3 { font-size: 1.2rem; margin-top: 0; border-bottom: 1px solid #555;}
+
+        .wax-seal { margin-top: 20px; text-align: center; font-family: 'Cinzel', serif; color: #a89f91; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .seed-display { font-size: 1.2rem; color: var(--gold-accent); letter-spacing: 2px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--wood-light); }
+
+        .scrollable-list { max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .scrollable-list::-webkit-scrollbar { width: 4px; }
+        .scrollable-list::-webkit-scrollbar-track { background: transparent; }
+        .scrollable-list::-webkit-scrollbar-thumb { background: var(--wood-light); border-radius: 2px; }
+
+        @media (max-width: 768px) {
+            .quest-board { padding: 15px; border-width: 6px;}
+            .hardware-plate { padding: 10px; }
+            .notices-layout { grid-template-columns: 1fr; }
+            .parchment { transform: rotate(0deg) !important; margin-bottom: 10px;}
         }
     </style>
 </head>
 <body>
 
-    <!-- Fondo y Efectos -->
-    <div class="bg-layer"></div>
-    <div class="vignette"></div>
-    <div class="fireflies-container" id="fireflies"></div>
+    <!-- =========================================
+         SECCIÓN 1: ESTADO (PARTE SUPERIOR / FONDO)
+         ========================================= -->
+    <section id="section-status">
+        <div class="bg-layer"></div>
+        <div class="vignette"></div>
+        <div class="fireflies-container" id="fireflies"></div>
 
-    <div class="quest-board">
-        <!-- Clavos decorativos -->
-        <div class="corner tl"></div><div class="corner tr"></div>
-        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="status-card">
+            <!-- Clavos decorativos -->
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
 
-        <h1>Abyss Rift</h1>
-        <!-- IP PÚBLICA ACTUALIZADA -->
-        <div class="server-ip">IP: 201.188.110.226:25565</div>
+            <h1 class="status-title">Abyss Rift</h1>
+            <div class="server-ip">IP: 201.188.110.226:25565</div>
 
-        <!-- Estado -->
-        <div id="visual-container" class="status-gem-container st-off-service">
-            <div class="gem"></div>
-            <div id="status-txt" class="status-text">DESCONECTADO</div>
-            <div id="desc-txt" class="status-desc">El portal está cerrado...</div>
-        </div>
-
-        <!-- Estadísticas -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-label">🔥 CPU (Temp)</span>
-                <span id="temp" class="stat-value">--°C</span>
+            <!-- Estado -->
+            <div id="visual-container" class="status-gem-container st-off-service">
+                <div class="gem"></div>
+                <div id="status-txt" class="status-text">DESCONECTADO</div>
+                <div id="desc-txt" class="status-desc">El portal está cerrado...</div>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">⚡ Energía</span>
-                <span id="bat" class="stat-value">--%</span>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">🔥 CPU (Temp)</span>
+                    <span id="temp" class="stat-value">--°C</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">⚡ Energía</span>
+                    <span id="bat" class="stat-value">--%</span>
+                </div>
+                <div class="stat-card col-span-2">
+                    <span class="stat-label">⚔️ Aventureros en línea</span>
+                    <span id="jug" class="stat-value">--</span>
+                </div>
             </div>
-            <div class="stat-card col-span-2">
-                <span class="stat-label">⚔️ Aventureros en línea</span>
-                <span id="jug" class="stat-value">--</span>
+
+            <!-- Comandos -->
+            <div class="spell-scroll">
+                <div class="spell-title">✨ Pergamino de Invocación</div>
+                <code id="cmdCode">Invoke-RestMethod -Uri "http://201.188.110.226:5000/start"</code>
+                <button onclick="copiar()" id="btn-copy">COPIAR HECHIZO</button>
+            </div>
+
+            <p class="disclaimer">
+                *Si el oráculo no responde, verifica los permisos.
+            </p>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SECCIÓN 2: TABLÓN DE MISIONES (SCROLL COVER)
+         ========================================= -->
+    <section id="section-missions">
+        <div class="quest-board">
+            
+            <!-- HARDWARE (Header Style) -->
+            <div class="hardware-plate reveal-on-scroll">
+                <h2>⚙ Maquinaria del Reino</h2>
+                <div class="specs-grid">
+                    <div class="spec-item"><strong>Corazón (CPU)</strong> Intel Core i5 2640m</div>
+                    <div class="spec-item"><strong>Memoria Vital (RAM)</strong> 5.5 GB Dedicados (G1GC)</div>
+                    <div class="spec-item"><strong>Motor Arcano</strong> Oracle GraalVM JDK 17</div>
+                    <div class="spec-item"><strong>Soporte Vital</strong> Linux Mint (Server Mode)</div>
+                    <div class="spec-item"><strong>Visión</strong> 6500 Bloques Precargados</div>
+                </div>
+            </div>
+
+            <div class="notices-layout">
+                <!-- COMBATE & RPG -->
+                <div class="parchment combat-paper reveal-on-scroll">
+                    <div class="pin"></div>
+                    <h3>⚔ Guerra y Magia</h3>
+                    <ul class="mod-list scrollable-list">
+                        <li><span class="mod-name">Better Combat</span> <span class="mod-desc">Animaciones reales</span></li>
+                        <li><span class="mod-name">Iron's Spells</span> <span class="mod-desc">Libros y Hechizos</span></li>
+                        <li><span class="mod-name">L_Ender's Cataclysm</span> <span class="mod-desc">Bosses Brutales</span></li>
+                        <li><span class="mod-name">Mowzie's Mobs</span> <span class="mod-desc">Entidades Legendarias</span></li>
+                        <li><span class="mod-name">Simply Swords</span> <span class="mod-desc">Armas únicas</span></li>
+                        <li><span class="mod-name">Fantasy Armor</span> <span class="mod-desc">Sets medievales</span></li>
+                        <li><span class="mod-name">Siege Weapons</span> <span class="mod-desc">Armas de asedio</span></li>
+                        <li><span class="mod-name">Illage & Spillage</span> <span class="mod-desc">Raids complejas</span></li>
+                        <li><span class="mod-name">Born in Chaos</span> <span class="mod-desc">Dificultad nocturna</span></li>
+                        <li><span class="mod-name">Passive Skill Tree</span> <span class="mod-desc">Árbol de talentos</span></li>
+                        <li><span class="mod-name">True Ending</span> <span class="mod-desc">Dragón rework</span></li>
+                        <li><span class="mod-name">Mutated Items</span> <span class="mod-desc">Items vivos</span></li>
+                    </ul>
+                </div>
+
+                <!-- MUNDO -->
+                <div class="parchment world-paper reveal-on-scroll">
+                    <div class="pin"></div>
+                    <h3>🗺 Cartografía</h3>
+                    <ul class="mod-list scrollable-list">
+                        <li><span class="mod-name">Dungeons Arise</span> <span class="mod-desc">Mega estructuras</span></li>
+                        <li><span class="mod-name">Towns & Towers</span> <span class="mod-desc">Pueblos inmersivos</span></li>
+                        <li><span class="mod-name">Terrablender</span> <span class="mod-desc">Generación de biomas</span></li>
+                        <li><span class="mod-name">Aquamirae</span> <span class="mod-desc">Océano helado</span></li>
+                        <li><span class="mod-name">Better End/Nether Cities</span> <span class="mod-desc">Ciudades mejoradas</span></li>
+                        <li><span class="mod-name">Yung's Collection</span> <span class="mod-desc">Dungeons vanilla+</span></li>
+                        <li><span class="mod-name">Sky Villages</span> <span class="mod-desc">Aldeas flotantes</span></li>
+                        <li><span class="mod-name">Tidal Towns</span> <span class="mod-desc">Pueblos marinos</span></li>
+                        <li><span class="mod-name">Structory</span> <span class="mod-desc">Ruinas ambientales</span></li>
+                        <li><span class="mod-name">Integrated Stronghold</span> <span class="mod-desc">Portal al End masivo</span></li>
+                        <li><span class="mod-name">Region Nether</span> <span class="mod-desc">Fortalezas infernales</span></li>
+                    </ul>
+                </div>
+
+                <!-- UTILIDAD & VISUAL -->
+                <div class="parchment utility-paper reveal-on-scroll">
+                    <div class="pin"></div>
+                    <h3>⚒ Vida y Entorno</h3>
+                    <ul class="mod-list scrollable-list">
+                        <li><span class="mod-name">Create</span> <span class="mod-desc">Ingeniería cinética</span></li>
+                        <li><span class="mod-name">Simple Voice Chat</span> <span class="mod-desc">Voz por proximidad</span></li>
+                        <li><span class="mod-name">Waystones</span> <span class="mod-desc">Pilares de viaje</span></li>
+                        <li><span class="mod-name">Sophisticated Backpacks</span> <span class="mod-desc">Mochilas</span></li>
+                        <li><span class="mod-name">Farmer's Delight</span> <span class="mod-desc">Cocina rústica</span></li>
+                        <li><span class="mod-name">Small Ships</span> <span class="mod-desc">Navegación</span></li>
+                        <li><span class="mod-name">Mythic Mounts</span> <span class="mod-desc">Monturas bestiales</span></li>
+                        <li><span class="mod-name">Stellar View</span> <span class="mod-desc">Cielo realista</span></li>
+                        <li><span class="mod-name">AmbientSounds</span> <span class="mod-desc">Sonido inmersivo</span></li>
+                        <li><span class="mod-name">Sound Physics</span> <span class="mod-desc">Eco y reverb</span></li>
+                        <li><span class="mod-name">Effective Weather</span> <span class="mod-desc">Clima físico</span></li>
+                        <li><span class="mod-name">AstikorCarts</span> <span class="mod-desc">Carretas de caballos</span></li>
+                        <li><span class="mod-name">Handcrafted</span> <span class="mod-desc">Mobiliario</span></li>
+                        <li><span class="mod-name">Gravestone</span> <span class="mod-desc">Tumbas de items</span></li>
+                    </ul>
+                </div>
+
+                <!-- TÉCNICO / OPTIMIZACIÓN -->
+                <div class="parchment tech-paper reveal-on-scroll">
+                    <div class="pin" style="background: #555;"></div>
+                    <div style="width: 100%;">
+                        <h3>🛡 Códice de Estabilidad (Optimización)</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Embeddium (Render)</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">FerriteCore (RAM)</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">ModernFix</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Spark (Profiler)</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">AI-Improvements</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Starlight (Luz)</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Chunky (Gen)</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">EntityCulling</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">MemoryLeakFix</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">ImmediatelyFast</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Radium/Lithium</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">ServerCore</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">Clumps (XP)</span>
+                            <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px;">FastFurnace</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wax-seal reveal-on-scroll">
+                <span>♦ Semilla del Mundo ♦</span>
+                <div class="seed-display">-4995054936707021313</div>
             </div>
         </div>
-
-        <!-- Comandos -->
-        <div class="spell-scroll">
-            <div class="spell-title">✨ Pergamino de Invocación</div>
-            <!-- COMANDO ACTUALIZADO A LA NUEVA IP -->
-            <code id="cmdCode">Invoke-RestMethod -Uri "http://201.188.110.226:5000/start"</code>
-            <button onclick="copiar()" id="btn-copy">COPIAR HECHIZO</button>
-        </div>
-
-        <p class="disclaimer">
-            *Si el oráculo no responde, verifica los permisos de seguridad de tu navegador.
-        </p>
-    </div>
+    </section>
 
     <script>
-        // --- LÓGICA DE LUCIÉRNAGAS REALISTA ---
+        // --- LÓGICA DE LUCIÉRNAGAS (SECCIÓN 1) ---
         function createFireflies() {
             const container = document.getElementById('fireflies');
-            const quantity = 30; // Más cantidad para mejor ambiente
+            const quantity = 30;
 
             for (let i = 0; i < quantity; i++) {
                 const firefly = document.createElement('div');
                 firefly.classList.add('firefly');
                 
-                // Posición inicial aleatoria
                 const startX = Math.random() * 100;
                 const startY = Math.random() * 100;
                 firefly.style.left = startX + '%';
                 firefly.style.top = startY + '%';
                 
-                // Tamaño variable
                 const size = 3 + Math.random() * 4;
                 firefly.style.width = size + 'px';
                 firefly.style.height = size + 'px';
 
-                // Variables CSS personalizadas para el movimiento errático
-                // Definimos desplazamientos aleatorios para los keyframes
                 firefly.style.setProperty('--moveX1', (Math.random() * 100 - 50) + 'px');
                 firefly.style.setProperty('--moveY1', (Math.random() * 100 - 50) + 'px');
                 firefly.style.setProperty('--moveX2', (Math.random() * 100 - 50) + 'px');
@@ -443,20 +597,19 @@
                 firefly.style.setProperty('--moveX3', (Math.random() * 100 - 50) + 'px');
                 firefly.style.setProperty('--moveY3', (Math.random() * 100 - 50) + 'px');
 
-                // Duraciones aleatorias para que no se sincronicen
-                const floatDuration = 15 + Math.random() * 20; // Lentas: entre 15 y 35s
-                const flashDuration = 4 + Math.random() * 6;   // Parpadeo: entre 4 y 10s
-                const delay = Math.random() * 10;              // Retraso inicial
+                const floatDuration = 15 + Math.random() * 20;
+                const flashDuration = 4 + Math.random() * 6;
+                const delay = Math.random() * 10;
 
                 firefly.style.animationDuration = `${floatDuration}s, ${flashDuration}s`;
-                firefly.style.animationDelay = `-${delay}s, -${delay}s`; // Start mid-cycle
+                firefly.style.animationDelay = `-${delay}s, -${delay}s`;
 
                 container.appendChild(firefly);
             }
         }
         createFireflies();
 
-        // --- LÓGICA DE CONEXIÓN (INTACTA) ---
+        // --- LÓGICA DE CONEXIÓN (SECCIÓN 1) ---
         const API = "http://201.188.110.226:5000";
 
         const ui = {
@@ -470,7 +623,6 @@
 
         async function update() {
             try {
-                // Timeout para evitar que se cuelgue si el server no responde
                 const controller = new AbortController();
                 const id = setTimeout(() => controller.abort(), 2000);
                 
@@ -478,10 +630,8 @@
                 const data = await res.json();
                 clearTimeout(id);
 
-                // Actualizar Stats
                 ui.temp.innerText = data.temp !== undefined ? data.temp : "--";
                 
-                // LÓGICA DE BATERÍA MEJORADA (Redondeo)
                 if (data.bateria !== undefined) {
                     let batLimpia = Math.round(Number(data.bateria));
                     ui.bat.innerText = batLimpia + "%";
@@ -489,7 +639,6 @@
                     ui.bat.innerText = "--%";
                 }
                 
-                // Lógica de jugadores
                 ui.jug.innerText = data.jugadores; 
                 if(data.jugadores !== "Vacio" && data.jugadores !== "Nadie" && data.jugadores !== null) {
                     ui.jug.classList.add('player-active');
@@ -497,7 +646,6 @@
                     ui.jug.classList.remove('player-active');
                 }
 
-                // Lógica de Estado Visual
                 if (data.estado === "encendido") {
                     setVisual("st-online", "ONLINE", "El servidor está activo.");
                 } else if (data.estado === "cargando") {
@@ -515,18 +663,14 @@
         }
 
         function setVisual(cls, title, desc) {
-            // Removemos todas las clases de estado previas
             ui.container.classList.remove('st-online', 'st-offline', 'st-loading', 'st-off-service');
             ui.container.classList.add(cls);
-            
             ui.txt.innerText = title;
             ui.desc.innerText = desc;
         }
 
-        // --- LÓGICA DE COPIADO ---
         function copiar() {
             const txt = document.getElementById('cmdCode').innerText;
-            
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(txt).then(confirmarCopia);
             } else {
@@ -547,17 +691,26 @@
         function confirmarCopia() {
             const btn = document.getElementById('btn-copy');
             const originalText = "COPIAR HECHIZO";
-            
             btn.innerText = "¡HECHIZO COPIADO!";
-            btn.style.background = "linear-gradient(to bottom, #d84315, #bf360c)"; // Naranja confirmación
-            
+            btn.style.background = "linear-gradient(to bottom, #d84315, #bf360c)";
             setTimeout(() => {
                 btn.innerText = originalText;
-                btn.style.background = ""; // Vuelve al estilo CSS original
+                btn.style.background = "";
             }, 2000);
         }
 
-        // Iniciar ciclo
+        // --- ANIMACIÓN DE SCROLL VISUAL ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Observar elementos clave
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
         setInterval(update, 3000);
         update();
     </script>
