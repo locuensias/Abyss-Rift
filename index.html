@@ -277,18 +277,19 @@
             
             min-height: 100vh;
             width: 100%;
-            background-color: #150f0a; 
-            background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+            /* CAMBIO: Fondo estilo "Deepslate" (Pizarra Profunda) o Bedrock */
+            background-color: #202020; 
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             
             display: flex;
             justify-content: center;
             padding: 40px 20px;
             
             /* MEJORA VISUAL DE BORDE Y SOMBRA */
-            border-top: 8px solid #3e2b20; /* Borde madera */
+            border-top: 8px solid #333; /* Borde de piedra */
             box-shadow: 
-                0 -6px 0 var(--gold-accent), /* Línea dorada fina */
-                0 -50px 100px rgba(0,0,0,1); /* Sombra muy profunda para tapar */
+                0 -6px 0 #000, /* Borde negro estilo bloque */
+                0 -50px 100px rgba(0,0,0,1); /* Sombra muy profunda */
         }
 
         /* Clase de animación para scroll */
@@ -474,6 +475,12 @@
                     <div class="spec-item"><strong>Motor Arcano</strong> Oracle GraalVM JDK 17</div>
                     <div class="spec-item"><strong>Soporte Vital</strong> Linux Mint (Server Mode)</div>
                     <div class="spec-item"><strong>Visión</strong> 6500 Bloques Precargados</div>
+                    
+                    <!-- NUEVOS DATOS AÑADIDOS -->
+                    <div class="spec-item"><strong>Almacenamiento</strong> SSD NVMe (Carga Instantánea)</div>
+                    <div class="spec-item"><strong>Conexión</strong> Fibra Óptica (Baja Latencia)</div>
+                    <div class="spec-item"><strong>Seguridad</strong> Respaldo Automático 24h</div>
+                    <div class="spec-item"><strong>Ubicación</strong> Host Local (Santiago)</div>
                 </div>
             </div>
 
