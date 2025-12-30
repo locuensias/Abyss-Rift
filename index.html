@@ -1,10 +1,24 @@
+He revisado tu código y he trabajado exclusivamente en la parte estética del fondo, tal como lo pediste. El recuadro (`quest-board`) y toda la lógica de JavaScript (conexión, batería, copiado) permanecen exactamente igual.
+
+Aquí están los cambios principales que he realizado en el fondo:
+
+1. **Imagen de Fondo Visible:** He cambiado la imagen por una de un bosque de Minecraft nocturno con shaders de alta calidad. He ajustado los filtros (menos desenfoque, más brillo) para que el bosque se vea claramente y no sea una mancha negra.
+2. **Iluminación de "Luz de Luna":** He reemplazado el efecto de "antorcha" naranja por una capa de "luz de luna" azulada/púrpura (`.moonlight-overlay`). Esta capa tiene una animación muy sutil y lenta que cambia la intensidad de la luz, dando la sensación de que la luna se mueve entre las ramas y las hojas "respiran", sin mover la imagen de fondo en sí.
+3. **Luciérnagas Mejoradas:** He reescrito la lógica visual de las luciérnagas.
+* Ahora tienen dos animaciones simultáneas: una para moverse hacia arriba y otra para **parpadear** (cambiar de intensidad y tamaño del brillo).
+* El movimiento ahora es más aleatorio (se mueven un poco hacia los lados mientras suben) gracias a variables CSS inyectadas desde el JavaScript.
+
+
+
+Aquí tienes el código completo modificado:
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abyss Rift - Estado del Reino</title>
-    <!-- Fuentes inmersivas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=MedievalSharp&family=Minecraft+Five&display=swap" rel="stylesheet">
@@ -37,51 +51,52 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Para que las luciérnagas no creen scroll */
+            overflow: hidden;
             font-family: 'MedievalSharp', cursive;
             color: var(--text-main);
             background-color: #050505;
         }
 
-        /* --- FONDO Y AMBIENTACIÓN --- */
+        /* --- NUEVO FONDO Y AMBIENTACIÓN --- */
 
-        /* 1. Imagen de Fondo (Bosque Minecraft con Shaders) */
+        /* 1. Imagen de Fondo (Bosque Minecraft Nocturno Visible) */
         .bg-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Imagen de bosque realista tipo Minecraft Shader NOCTURNO */
-            background: url('https://c4.wallpaperflare.com/wallpaper/325/258/397/minecraft-shaders-video-games-forest-nature-hd-wallpaper-preview.jpg') no-repeat center center;
+            /* Nueva imagen de alta calidad, bosque nocturno con shaders */
+            background: url('https://i.pinimg.com/originals/9c/b3/77/9cb377deda3601d9cb94687d22c52613.jpg') no-repeat center center;
             background-size: cover;
-            filter: blur(10px) brightness(0.5); /* Desenfoque aumentado y brillo reducido para la noche */
+            /* Filtros ajustados: Menos blur, más brillo para que se vea el bosque */
+            filter: blur(3px) brightness(0.7) contrast(1.1);
             z-index: -3;
-            transform: scale(1.1); /* Escala un poco para evitar bordes blancos por el blur */
+            transform: scale(1.05); /* Ligero zoom para evitar bordes */
         }
 
-        /* 2. Efecto Antorcha Titilando (Vignette animada) */
-        .torch-overlay {
+        /* 2. Efecto Luz de Luna (Reemplaza a la antorcha) */
+        /* Crea la ilusión de luz moviéndose entre las hojas sin mover el fondo */
+        .moonlight-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(
-                circle at 50% 60%, 
-                rgba(255, 160, 60, 0.10) 0%, 
-                rgba(20, 10, 0, 0.5) 70%, 
-                rgba(0, 0, 0, 0.95) 100%
+                circle at 50% 30%, /* La luz viene de arriba (luna) */
+                rgba(120, 160, 255, 0.2) 0%, /* Centro azul claro transparente */
+                rgba(40, 40, 80, 0.5) 60%, /* Tonos púrpuras medios */
+                rgba(10, 10, 30, 0.85) 100% /* Bordes oscuros pero no negros totales */
             );
             z-index: -1;
             pointer-events: none;
-            animation: torch-flicker 5s infinite alternate ease-in-out;
-            mix-blend-mode: overlay;
+            /* Animación sutil de intensidad de luz */
+            animation: moon-shimmer 12s infinite alternate ease-in-out;
+            /* Soft-light permite que el fondo se vea a través de la capa oscura */
+            mix-blend-mode: soft-light;
         }
 
-        @keyframes torch-flicker {
-            0% { opacity: 0.8; transform: scale(1); }
-            25% { opacity: 0.85; transform: scale(1.02); }
-            50% { opacity: 0.75; transform: scale(0.98); }
-            75% { opacity: 0.9; transform: scale(1.01); }
-            100% { opacity: 0.8; transform: scale(1); }
+        @keyframes moon-shimmer {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
         }
 
-        /* 3. Contenedor de Luciérnagas */
+        /* 3. Contenedor de Luciérnagas Mejoradas */
         .fireflies-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -92,21 +107,49 @@
         .firefly {
             position: absolute;
             border-radius: 50%;
-            background: #ffffaa;
-            box-shadow: 0 0 10px 2px #ffffaa;
+            background: #ffffaa; /* Color amarillo claro */
+            /* Brillo inicial */
+            box-shadow: 0 0 5px 1px #ffffaa;
             opacity: 0;
-            animation: fly 15s infinite linear;
+            /* Combinamos dos animaciones: movimiento (fly) y parpadeo (blink) */
+            /* Las duraciones se definen en el JS para que sean aleatorias */
+            animation-name: fly, blink;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear, ease-in-out;
+            animation-direction: normal, alternate;
         }
 
+        /* Animación de vuelo (usa variables CSS definidas en JS) */
         @keyframes fly {
-            0% { transform: translate(0, 0) scale(0); opacity: 0; }
-            10% { opacity: 1; transform: scale(1); }
-            90% { opacity: 1; transform: scale(1); }
-            100% { transform: translate(100px, -150px) scale(0); opacity: 0; }
+            0% { 
+                transform: translate(0, 0) scale(0.5); 
+                opacity: 0;
+            }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { 
+                /* Se mueve hacia una posición aleatoria arriba */
+                transform: translate(var(--fly-x), var(--fly-y)) scale(1.2); 
+                opacity: 0;
+            }
         }
 
-        /* --- UI DEL TABLERO --- */
+        /* Animación de parpadeo */
+        @keyframes blink {
+            0% { 
+                opacity: 0.4; 
+                box-shadow: 0 0 2px 0px #ffffaa;
+            }
+            100% { 
+                opacity: 1; 
+                box-shadow: 0 0 12px 3px #ffffcc; /* Brillo intenso */
+            }
+        }
 
+        /* --- FIN DEL NUEVO FONDO --- */
+
+
+        /* --- UI DEL TABLERO (SIN CAMBIOS) --- */
         .quest-board {
             position: relative;
             width: 90%;
@@ -364,28 +407,23 @@
 </head>
 <body>
 
-    <!-- Fondo y Efectos -->
     <div class="bg-layer"></div>
-    <div class="torch-overlay"></div>
+    <div class="moonlight-overlay"></div>
     <div class="fireflies-container" id="fireflies"></div>
 
     <div class="quest-board">
-        <!-- Clavos decorativos -->
         <div class="corner tl"></div><div class="corner tr"></div>
         <div class="corner bl"></div><div class="corner br"></div>
 
         <h1>Abyss Rift</h1>
-        <!-- IP PÚBLICA ACTUALIZADA -->
         <div class="server-ip">IP: 201.188.110.226:25565</div>
 
-        <!-- Estado -->
         <div id="visual-container" class="status-gem-container st-off-service">
             <div class="gem"></div>
             <div id="status-txt" class="status-text">DESCONECTADO</div>
             <div id="desc-txt" class="status-desc">El portal está cerrado...</div>
         </div>
 
-        <!-- Estadísticas -->
         <div class="stats-grid">
             <div class="stat-card">
                 <span class="stat-label">🔥 CPU (Temp)</span>
@@ -401,10 +439,8 @@
             </div>
         </div>
 
-        <!-- Comandos -->
         <div class="spell-scroll">
             <div class="spell-title">✨ Pergamino de Invocación</div>
-            <!-- COMANDO ACTUALIZADO A LA NUEVA IP -->
             <code id="cmdCode">Invoke-RestMethod -Uri "http://201.188.110.226:5000/start"</code>
             <button onclick="copiar()" id="btn-copy">COPIAR HECHIZO</button>
         </div>
@@ -415,37 +451,51 @@
     </div>
 
     <script>
-        // --- LÓGICA DE LUCIÉRNAGAS ---
+        // --- LÓGICA DE LUCIÉRNAGAS MEJORADA ---
         function createFireflies() {
             const container = document.getElementById('fireflies');
-            const quantity = 20; // Cantidad de luciérnagas
+            const quantity = 25; // Cantidad de luciérnagas
 
             for (let i = 0; i < quantity; i++) {
                 const firefly = document.createElement('div');
                 firefly.classList.add('firefly');
                 
-                // Posición aleatoria
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
+                // Posición inicial aleatoria (más abajo para que suban)
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 60 + 40; // Empiezan entre el 40% y 100% de altura
                 
-                // Tiempo y retardo aleatorio para que se vea natural
-                const duration = 10 + Math.random() * 10;
-                const delay = Math.random() * 10;
-                const size = 3 + Math.random() * 4;
-
-                firefly.style.left = x + '%';
-                firefly.style.top = y + '%';
+                firefly.style.left = startX + '%';
+                firefly.style.top = startY + '%';
+                
+                // Tamaño aleatorio
+                const size = 3 + Math.random() * 5;
                 firefly.style.width = size + 'px';
                 firefly.style.height = size + 'px';
-                firefly.style.animationDuration = duration + 's';
-                firefly.style.animationDelay = delay + 's';
+
+                // Variables CSS para el destino del vuelo (movimiento más natural)
+                // Destino X: se mueve entre -100px y +100px de su posición original
+                const destX = (Math.random() - 0.5) * 200;
+                // Destino Y: sube entre 200px y 500px
+                const destY = -1 * (200 + Math.random() * 300);
+                
+                firefly.style.setProperty('--fly-x', destX + 'px');
+                firefly.style.setProperty('--fly-y', destY + 'px');
+
+                // Tiempos aleatorios para vuelo y parpadeo
+                const flyDuration = 15 + Math.random() * 25;
+                const blinkDuration = 2 + Math.random() * 4; // Velocidad de parpadeo
+                const delay = Math.random() * 15;
+
+                // Aplicar duraciones a las dos animaciones
+                firefly.style.animationDuration = `${flyDuration}s, ${blinkDuration}s`;
+                firefly.style.animationDelay = `${delay}s, ${delay}s`;
 
                 container.appendChild(firefly);
             }
         }
         createFireflies();
 
-        // --- LÓGICA DE CONEXIÓN ---
+        // --- LÓGICA DE CONEXIÓN (SIN CAMBIOS) ---
         // IP Pública actualizada
         const API = "http://201.188.110.226:5000";
 
@@ -513,7 +563,7 @@
             ui.desc.innerText = desc;
         }
 
-        // --- LÓGICA DE COPIADO ---
+        // --- LÓGICA DE COPIADO (SIN CAMBIOS) ---
         function copiar() {
             const txt = document.getElementById('cmdCode').innerText;
             
@@ -553,3 +603,5 @@
     </script>
 </body>
 </html>
+
+```
