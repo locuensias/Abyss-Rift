@@ -277,7 +277,7 @@
             
             min-height: 100vh;
             width: 100%;
-            /* CAMBIO: Fondo estilo "Deepslate" (Pizarra Profunda) o Bedrock */
+            /* Fondo estilo "Deepslate" (Pizarra Profunda) o Bedrock */
             background-color: #202020; 
             background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             
@@ -285,7 +285,7 @@
             justify-content: center;
             padding: 40px 20px;
             
-            /* MEJORA VISUAL DE BORDE Y SOMBRA */
+            /* Borde y Sombra */
             border-top: 8px solid #333; /* Borde de piedra */
             box-shadow: 
                 0 -6px 0 #000, /* Borde negro estilo bloque */
@@ -344,8 +344,8 @@
             font-size: 1.5rem; margin-bottom: 15px; letter-spacing: 2px;
             border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
         }
-        .specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 0.95rem; }
-        .spec-item strong { display: block; color: var(--gold-accent); font-size: 0.8rem; text-transform: uppercase; }
+        .specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 0.95rem; }
+        .spec-item strong { display: block; color: var(--gold-accent); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 3px;}
 
         /* LAYOUT */
         .notices-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; align-items: start; }
@@ -470,17 +470,17 @@
             <div class="hardware-plate reveal-on-scroll">
                 <h2>⚙ Maquinaria del Reino</h2>
                 <div class="specs-grid">
-                    <div class="spec-item"><strong>Corazón (CPU)</strong> Intel Core i5 2640m</div>
-                    <div class="spec-item"><strong>Memoria Vital (RAM)</strong> 5.5 GB Dedicados (G1GC)</div>
-                    <div class="spec-item"><strong>Motor Arcano</strong> Oracle GraalVM JDK 17</div>
-                    <div class="spec-item"><strong>Soporte Vital</strong> Linux Mint (Server Mode)</div>
-                    <div class="spec-item"><strong>Visión</strong> 6500 Bloques Precargados</div>
-                    
-                    <!-- NUEVOS DATOS AÑADIDOS -->
-                    <div class="spec-item"><strong>Almacenamiento</strong> SSD NVMe (Carga Instantánea)</div>
-                    <div class="spec-item"><strong>Conexión</strong> Fibra Óptica (Baja Latencia)</div>
-                    <div class="spec-item"><strong>Seguridad</strong> Respaldo Automático 24h</div>
-                    <div class="spec-item"><strong>Ubicación</strong> Host Local (Santiago)</div>
+                    <div class="spec-item"><strong>Equipo Host</strong> Dell N4050</div>
+                    <div class="spec-item"><strong>Procesador</strong> Intel Core i5 2640m</div>
+                    <div class="spec-item"><strong>Almacenamiento</strong> SSD 128GB</div>
+                    <div class="spec-item"><strong>RAM Total Asignada</strong> 8GB dual: 5.5 GB (Server) / 2.5 GB (S.O.)</div>
+                    <div class="spec-item"><strong>O.S.</strong> Linux Mint</div>
+                    <div class="spec-item"><strong>Modo de Ejecución</strong> Sin interfaz visual (Server mode)</div>
+                    <div class="spec-item"><strong>Versión Java</strong> Oracle GraalVM for JDK 17</div>
+                    <div class="spec-item"><strong>Argumentos Java</strong> G1GC Relaxed Latency Configuration</div>
+                    <div class="spec-item"><strong>Precarga (Chunky)</strong> Radio circular de 6500 bloques por mundo</div>
+                    <div class="spec-item"><strong>Tipo de Conexión</strong> Directa (Port Forwarding/NAT) - "Puente" en Router</div>
+                    <div class="spec-item"><strong>Configuración de Puertos</strong> 25565 (TCP/UDP) para Juego | 5000 (TCP) para Control</div>
                 </div>
             </div>
 
@@ -639,9 +639,18 @@
 
                 ui.temp.innerText = data.temp !== undefined ? data.temp : "--";
                 
-                if (data.bateria !== undefined) {
-                    let batLimpia = Math.round(Number(data.bateria));
-                    ui.bat.innerText = batLimpia + "%";
+                // --- LÓGICA DE BATERÍA CORREGIDA (FIX NAN) ---
+                if (data.bateria !== undefined && data.bateria !== null) {
+                    // Forzar conversión a número flotante primero (maneja strings con o sin texto extra si empieza con numero)
+                    let val = parseFloat(data.bateria);
+                    
+                    if (!isNaN(val)) {
+                        // Redondear a entero
+                        ui.bat.innerText = Math.round(val) + "%";
+                    } else {
+                        // Si no se pudo obtener un número válido
+                        ui.bat.innerText = "--%";
+                    }
                 } else {
                     ui.bat.innerText = "--%";
                 }
