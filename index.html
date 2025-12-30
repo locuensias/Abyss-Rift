@@ -33,6 +33,7 @@
         .stat { background: #21262d; padding: 10px; border-radius: 6px; font-size: 14px; }
         .stat b { display: block; color: #fff; font-size: 18px; margin-top: 5px; }
         
+        /* Estilo para lista de jugadores */
         #jug { word-wrap: break-word; font-size: 14px; line-height: 1.2; }
 
         .cmd-box { background: #000; padding: 15px; border-radius: 8px; text-align: left; border: 1px solid #30363d; }
@@ -50,7 +51,7 @@
 
     <div class="card">
         <h1>ABYSS RIFT</h1>
-        <p style="font-size:12px; color:#8b949e; margin-bottom:20px;">IP: 201.188.96.213:25565</p>
+        <p style="font-size:12px; color:#8b949e; margin-bottom:20px;">IP: 201.188.110.226:25565</p>
 
         <div id="box" class="status-box st-off-service">
             <span id="status-txt" class="big-text">OFF SERVICE</span>
@@ -67,18 +68,18 @@
 
         <div class="cmd-box">
             <div style="font-size:11px; color:#8b949e; margin-bottom:5px; font-weight:bold;">⚡ COMANDO DE ENCENDIDO:</div>
-            <code id="cmdCode">Invoke-RestMethod -Uri "http://201.188.96.213:5000/start"</code>
+            <code id="cmdCode">Invoke-RestMethod -Uri "http://201.188.110.226:5000/start"</code>
             <button onclick="copiar()" id="btn-copy">COPIAR AL PORTAPAPELES</button>
         </div>
         
         <p style="font-size: 10px; color: #555; margin-top: 15px;">
-            *Si no actualiza, revisa el candado del navegador (Permitir contenido no seguro).
+            *Si no actualiza, revisa que el candado del navegador permita contenido "no seguro" (http).
         </p>
     </div>
 
     <script>
-        // CAMBIO 3: CONEXIÓN JAVASCRIPT (Vital para ver el estado)
-        const API = "http://201.188.96.213:5000";
+        // LA CONSTANTE API DEBE APUNTAR A TU IP PÚBLICA
+        const API = "http://201.188.110.226:5000";
 
         const ui = {
             box: document.getElementById('box'),
@@ -91,6 +92,7 @@
 
         async function update() {
             try {
+                // Timeout de 2 segundos para no colgar la página si el server está apagado
                 const controller = new AbortController();
                 const id = setTimeout(() => controller.abort(), 2000);
                 
@@ -103,7 +105,7 @@
                 
                 ui.jug.innerText = data.jugadores; 
                 if(data.jugadores !== "Vacio" && data.jugadores !== "Nadie") {
-                    ui.jug.style.color = "#a5d6ff";
+                    ui.jug.style.color = "#a5d6ff"; 
                 } else {
                     ui.jug.style.color = "#fff";
                 }
